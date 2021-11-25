@@ -4,7 +4,9 @@ import mongoose from "mongoose"
 import cors from "cors"
 import listEndpoints from "express-list-endpoints"
 // ******************** ROUTERS ********************
-import usersRouter from "../src/services/users/routes.js"
+import usersRouter from "../src/services/users/userRoutes.js"
+import clientsRouter from "../src/services/users/clientRoutes.js"
+import therapistsRouter from "../src/services/users/therapistRoutes.js"
 // ******************** ERROR HANDLERS ********************
 import { badRequest, unauthorized, forbidden, notFound, serverError} from "./errorHandlers.js"
 
@@ -27,12 +29,14 @@ const corsOpts = {
 }
 
 // ******************** MIDDLEWARES ********************
-server.use(cors())
+server.use(cors(corsOpts))
 server.use(express.json())
 
 
 // ******************** ROUTES ********************
 server.use("/users", usersRouter)
+server.use("/clients", clientsRouter)
+server.use("/therapists", therapistsRouter)
 
 
 // ******************** ERROR HANDLERS ********************
