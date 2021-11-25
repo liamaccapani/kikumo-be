@@ -19,6 +19,7 @@ export const therapistModel = userModel.discriminator(
     ],
     appointments: [{ type: Schema.ObjectId, ref: "Appointment" }],
     availableDays: [{ type: Date, required: true }],
-    specialization: { type: Schema.ObjectId, ref: "Specialization" }
+    specialization: { type: String, default: "Bingo Bongo" }
+    // specialization: { type: Schema.ObjectId, ref: "Specialization" }
   })
 );

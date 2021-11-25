@@ -70,15 +70,30 @@ therapistsRouter.post("/me/experiences", tokenAuthMiddleware, async (req, res, n
         { $push: { experiences: newExperience } },
         { new: true }
       )
-      if (updatedTherapist) {
         res.send(updatedTherapist)
-      } else {
-        next(createHttpError(404, "Therapist not found"))
-      }
+    
     } catch (error) {
       next(error);
     }
   }
 );
+
+therapistsRouter.put("/me/experiences/:experienceId", tokenAuthMiddleware, async (req, res, next) => {
+  try {
+      const me = req.user
+     // user is a MONGOOSE DOCUMENT not a normal plain JS object
+      const expIndex = me.experiences.findIndex(exp => exp._id.toString() === req.params.experienceId)
+      if (expIndex !== -1) {
+        me.experiences[expIndex] = { ...me.experiences[expIndex].toObject(), ...req.body }
+        await me.save()
+        res.send(me)
+      } else {
+        next(createHttpError(404, "Experience not found"))
+      }
+  } catch (error) {
+    next(error);
+  }  
+}
+)
 
 export default therapistsRouter;
