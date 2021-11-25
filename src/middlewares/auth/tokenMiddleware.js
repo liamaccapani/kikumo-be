@@ -9,7 +9,7 @@ export const tokenAuthMiddleware = async (req, res, next) => {
       const token = req.headers.authorization.replace("Bearer ", "");
       const decodedToken = await verifyToken(token);
       // decoded token = _id, iat, exp
-      console.log("Decoded Token: ", decodedToken)
+      // console.log("Decoded Token: ", decodedToken)
       // see payload JWTAuthGenerate
       const user = await userModel.findById(decodedToken._id);
       if (user) {

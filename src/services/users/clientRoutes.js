@@ -27,6 +27,12 @@ clientsRouter.post("/register", userValidation, async (req, res, next) => {
   }
 });
 
-
+clientsRouter.get("/me", tokenAuthMiddleware, async (req, res, next) => {
+  try {
+    res.send(req.user);
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default clientsRouter;

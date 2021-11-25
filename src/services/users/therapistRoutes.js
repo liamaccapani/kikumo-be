@@ -4,7 +4,8 @@ import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
 // ******************** MODELS ********************
 import userModel from "./userBaseSchema.js";
-import { therapistModel } from "./therapistSchema.js"
+import experienceModel from "./experienceSchema.js"
+import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";
@@ -12,7 +13,6 @@ import { userValidation } from "../../middlewares/validation/userValidation.js";
 import { clientsOnly } from "../../middlewares/auth/roleChecker.js";
 
 const therapistsRouter = express.Router();
-
 
 therapistsRouter.post("/register", userValidation, async (req, res, next) => {
   try {
@@ -30,15 +30,55 @@ therapistsRouter.post("/register", userValidation, async (req, res, next) => {
   }
 });
 
-// ADD CLIENTS ONLY
-therapistsRouter.get("/", tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+therapistsRouter.get(
+  "/",
+  tokenAuthMiddleware,
+  clientsOnly,
+  async (req, res, next) => {
     try {
-        const therapists = await therapistModel.find().select(["-appointments", "-__v"]);
-        res.send(therapists);
+      const therapists = await therapistModel
+        .find()
+        .select(["-appointments", "-__v"]);
+      res.send(therapists);
     } catch (error) {
-        next(error);
+      next(error);
     }
-})
+  }
+);
 
+therapistsRouter.get("/me", tokenAuthMiddleware, async (req, res, next) => {
+  try {
+    res.send(req.user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+therapistsRouter.get("/me/experiences", tokenAuthMiddleware, async (req, res, next) => {
+  try {
+    res.send(req.user.experiences);
+  } catch (error) {
+    next(error);
+  }
+});
+
+therapistsRouter.post("/me/experiences", tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      const newExperience = new experienceModel(req.body)
+      const updatedTherapist = await therapistModel.findByIdAndUpdate(
+        req.user._id, 
+        { $push: { experiences: newExperience } },
+        { new: true }
+      )
+      if (updatedTherapist) {
+        res.send(updatedTherapist)
+      } else {
+        next(createHttpError(404, "Therapist not found"))
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default therapistsRouter;

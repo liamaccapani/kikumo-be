@@ -9,12 +9,12 @@ export const therapistModel = userModel.discriminator(
   new Schema({
     experiences: [
       {
-        role: { type: String, required: true },
-        company: { type: String },
-        startDate: { type: Date, required: true },
-        endDate: { type: Date },
-        description: { type: String, required: true },
-        area: { type: String, required: true },
+        role: String,
+        company: String,
+        startDate: Date,
+        endDate: Date,
+        description: String,
+        area: String,
       },
     ],
     appointments: [{ type: Schema.ObjectId, ref: "Appointment" }],
