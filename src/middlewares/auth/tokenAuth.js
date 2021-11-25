@@ -26,7 +26,7 @@ export const verifyToken = (token) =>
 
 export const generateToken = async (user) => {
   // given the user --> generates token --> pass ID in payload
-  const accessToken = await JWTGenerateToken({ _id: user._id });
+  const accessToken = await JWTGenerateToken({ _id: user._id, role: user.role });
 
   return accessToken;
 };

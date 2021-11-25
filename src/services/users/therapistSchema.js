@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import userModel from "./userBaseSchema.js"
 
-const { Schema, model } = mongoose;
+const { Schema } = mongoose;
 
 export const therapistSchema = userModel.discriminator(
   "Therapist",
@@ -10,7 +10,7 @@ export const therapistSchema = userModel.discriminator(
     experiences: [
       {
         role: { type: String, required: true },
-        company: { type: String, required: true },
+        company: { type: String },
         startDate: { type: Date, required: true },
         endDate: { type: Date },
         description: { type: String, required: true },
@@ -19,5 +19,6 @@ export const therapistSchema = userModel.discriminator(
     ],
     appointments: [{ type: Schema.ObjectId, ref: "Appointment" }],
     availableDays: [{ type: Date, required: true }],
+    specialization: { type: Schema.ObjectId, ref: "Specialization" }
   })
 );
