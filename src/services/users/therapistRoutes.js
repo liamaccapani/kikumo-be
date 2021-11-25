@@ -10,7 +10,7 @@ import { therapistModel } from "./therapistSchema.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";
 import { userValidation } from "../../middlewares/validation/userValidation.js";
-import { clientsOnly } from "../../middlewares/auth/roleChecker.js";
+import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
 
 const therapistsRouter = express.Router();
 
@@ -62,7 +62,7 @@ therapistsRouter.get("/me/experiences", tokenAuthMiddleware, async (req, res, ne
   }
 });
 
-therapistsRouter.post("/me/experiences", tokenAuthMiddleware, async (req, res, next) => {
+therapistsRouter.post("/me/experiences", tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
       const newExperience = new experienceModel(req.body)
       const updatedTherapist = await therapistModel.findByIdAndUpdate(
@@ -78,7 +78,7 @@ therapistsRouter.post("/me/experiences", tokenAuthMiddleware, async (req, res, n
   }
 );
 
-therapistsRouter.put("/me/experiences/:experienceId", tokenAuthMiddleware, async (req, res, next) => {
+therapistsRouter.put("/me/experiences/:experienceId", tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
   try {
       const me = req.user
      // user is a MONGOOSE DOCUMENT not a normal plain JS object
