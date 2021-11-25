@@ -3,7 +3,7 @@ import express from "express";
 import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
 // ******************** MODELS ********************
-import userModel from "../users/schema.js";
+import userModel from "./userBaseSchema.js";
 // ******************** MIDDLEWARES ********************
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";

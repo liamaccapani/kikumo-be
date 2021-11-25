@@ -6,8 +6,8 @@ const appointmentSchema = new Schema(
   {
     startDate: { type: String, required: true },
     endDate: { type: String, required: true },
-    clientId: { type: String, required: true },
-    therapistId: { type: String, required: true },
+    client: { type: Schema.ObjectId, ref: "Client" },
+    therapist: { type: Schema.ObjectId, ref: "Therapist" },
     description: { type: String }
   },
   { timestamps: true }

@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import userModel from "../../services/users/schema.js";
+import userModel from "../../services/users/userBaseSchema.js";
 import { verifyToken } from "./tokenAuth.js";
 
 export const tokenAuthMiddleware = async (req, res, next) => {
