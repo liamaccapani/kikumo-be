@@ -4,14 +4,14 @@ import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
 // ******************** MODELS ********************
 import userModel from "./userBaseSchema.js";
+import { therapistModel } from "./therapistSchema.js"
 // ******************** MIDDLEWARES ********************
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";
 import { userValidation } from "../../middlewares/validation/userValidation.js";
-import { therapistsOnly } from "../../middlewares/auth/therapistsOnly.js";
+import { clientsOnly } from "../../middlewares/auth/roleChecker.js";
 
 const therapistsRouter = express.Router();
-
 
 
 therapistsRouter.post("/register", userValidation, async (req, res, next) => {
@@ -29,6 +29,16 @@ therapistsRouter.post("/register", userValidation, async (req, res, next) => {
     next(error);
   }
 });
+
+// ADD CLIENTS ONLY
+therapistsRouter.get("/", tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+    try {
+        const therapists = await therapistModel.find().select(["-appointments", "-__v"]);
+        res.send(therapists);
+    } catch (error) {
+        next(error);
+    }
+})
 
 
 export default therapistsRouter;

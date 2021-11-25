@@ -4,7 +4,7 @@ import userModel from "./userBaseSchema.js"
 
 const { Schema } = mongoose;
 
-export const therapistSchema = userModel.discriminator(
+export const therapistModel = userModel.discriminator(
   "Therapist",
   new Schema({
     experiences: [

@@ -8,7 +8,7 @@ import userModel from "./userBaseSchema.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";
 import { userValidation } from "../../middlewares/validation/userValidation.js";
-import { therapistsOnly } from "../../middlewares/auth/therapistsOnly.js";
+import { therapistsOnly } from "../../middlewares/auth/roleChecker.js";
 
 const usersRouter = express.Router();
 

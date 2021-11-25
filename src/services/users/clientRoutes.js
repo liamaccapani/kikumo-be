@@ -8,11 +8,8 @@ import userModel from "./userBaseSchema.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";
 import { userValidation } from "../../middlewares/validation/userValidation.js";
-import { therapistsOnly } from "../../middlewares/auth/therapistsOnly.js";
 
 const clientsRouter = express.Router();
-
-
 
 clientsRouter.post("/register", userValidation, async (req, res, next) => {
   try {
@@ -29,6 +26,7 @@ clientsRouter.post("/register", userValidation, async (req, res, next) => {
     next(error);
   }
 });
+
 
 
 export default clientsRouter;
