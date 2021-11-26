@@ -1,19 +1,24 @@
 // ******************** PACKAGES ********************
 import express from "express";
 import createHttpError from "http-errors";
-import { validationResult } from "express-validator";
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary"
+import { CloudinaryStorage } from "multer-storage-cloudinary"
 // ******************** MODELS ********************
-import userModel from "./userBaseSchema.js";
 import experienceModel from "./experienceSchema.js";
 import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
-import {
-  clientsOnly,
-  therapistsOnly,
-} from "../../middlewares/auth/roleChecker.js";
+import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
 
 const router = express.Router();
+
+const cloudStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+      folder: "profilepictures",
+  },
+}) 
 
 router
   .route("/")
@@ -94,5 +99,16 @@ router
       next(error)
     }
   });
+
+  // router.route("/me/avatar").put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
+  //   try {
+  //     // console.log(req.file)
+  //     const avatar = await therapistModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.body }}, {new: true})
+  //     console.log(avatar)
+  //     res.send(avatar)
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // })
 
 export default router;
