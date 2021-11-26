@@ -81,6 +81,18 @@ router
     } catch (error) {
       next(error);
     }
+  })
+  .delete(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
+    try {
+      const therapist = await therapistModel.findByIdAndUpdate(
+        req.user._id,
+        { $pull: { experiences: { _id: req.params.experienceId } } },
+        { new: true }
+      )
+      res.send(therapist) 
+    } catch (error) {
+      next(error)
+    }
   });
 
 export default router;
