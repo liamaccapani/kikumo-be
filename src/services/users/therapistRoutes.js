@@ -47,7 +47,7 @@ router.route("/register").post(userValidation, async (req, res, next) => {
 // Get all Therapists (only for Clients)
 router
   .route("/")
-  .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+  .get(tokenAuthMiddleware, async (req, res, next) => {
     try {
       const therapists = await therapistModel
         .find()
