@@ -41,6 +41,20 @@ router.route("/register").post(userValidation, async (req, res, next) => {
   }
 });
 
+// Get all Clients
+router
+  .route("/")
+  .get(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      const clients = await clientModel
+        .find()
+        .select(["-appointments", "-__v"]);
+      res.send(clients);
+    } catch (error) {
+      next(error);
+    }
+  });
+
 // Get Profile (for) Client + Edit name and surname
 router.route("/me")
  .get(tokenAuthMiddleware, async (req, res, next) => {
@@ -69,5 +83,19 @@ router.route("/me/avatar").post(tokenAuthMiddleware, clientsOnly, multer({ stora
     next(error)
   }
 })
+
+// Get Client by Id
+router
+  .route("/:clientId")
+  .get(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      const client = await clientModel
+        .findById(req.params.clientId)
+        .select(["-appointments", "-__v"]);
+      res.send(client);
+    } catch (error) {
+      next(error);
+    }
+  });
 
 export default router;

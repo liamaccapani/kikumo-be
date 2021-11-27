@@ -183,6 +183,4 @@ router
   });
 
 
-// Get single Client by id
-
 export default router;
