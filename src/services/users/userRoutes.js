@@ -23,23 +23,6 @@ const cloudStorage = new CloudinaryStorage({
   },
 });
 
-router.route("/register").post(userValidation, async (req, res, next) => {
-  try {
-    const errorsList = validationResult(req);
-    if (!errorsList.isEmpty()) {
-      next(createHttpError(400, { errorsList }));
-    } else {
-      const newUser = new userModel(req.body);
-      const { _id } = await newUser.save();
-      const accessToken = await generateToken(newUser);
-      res.status(201).send({ _id, accessToken });
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-
 router.route("/login").post(async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -55,16 +38,50 @@ router.route("/login").post(async (req, res, next) => {
   }
 });
 
-router.route("/me/avatar").post(tokenAuthMiddleware, clientsOnly, multer({ storage: cloudStorage }).single("avatar"), async (req, res, next) => {
-  try {
-    // console.log(req.file)
-    const avatar = await userModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.file.path }}, {new: true})
-    console.log(avatar)
-    res.send(avatar)
-  } catch (error) {
-    next(error)
-  }
-})
+// router.route("/register").post(userValidation, async (req, res, next) => {
+//   try {
+//     const errorsList = validationResult(req);
+//     if (!errorsList.isEmpty()) {
+//       next(createHttpError(400, { errorsList }));
+//     } else {
+//       const newUser = new userModel(req.body);
+//       const { _id } = await newUser.save();
+//       const accessToken = await generateToken(newUser);
+//       res.status(201).send({ _id, accessToken });
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+
+// router.route("/me")
+//  .get(tokenAuthMiddleware, async (req, res, next) => {
+//   try {
+//     res.send(req.user);
+//   } catch (error) {
+//     next(error);
+//   }
+//  })
+//  .put(tokenAuthMiddleware, async (req, res, next) => {
+//   try {
+//     const updateClient = await userModel.findByIdAndUpdate(req.user._id, req.body, {new: true})
+//     res.send(updateClient).status(200)
+//   } catch (error) {
+//     next(error);
+//   }
+//  });
+
+// router.route("/me/avatar").post(tokenAuthMiddleware, clientsOnly, multer({ storage: cloudStorage }).single("avatar"), async (req, res, next) => {
+//   try {
+//     // console.log(req.file)
+//     const avatar = await userModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.file.path }}, {new: true})
+//     console.log(avatar)
+//     res.send(avatar)
+//   } catch (error) {
+//     next(error)
+//   }
+// })
 
 
 export default router;

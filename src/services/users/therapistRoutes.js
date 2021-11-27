@@ -24,6 +24,7 @@ const cloudStorage = new CloudinaryStorage({
   },
 });
 
+// Register
 router.route("/register").post(userValidation, async (req, res, next) => {
   try {
     const errorsList = validationResult(req);
@@ -40,6 +41,8 @@ router.route("/register").post(userValidation, async (req, res, next) => {
   }
 });
 
+
+// Get all therapists (only for clients)
 router
   .route("/")
   .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
@@ -53,14 +56,40 @@ router
     }
   });
 
-router.route("/me").get(tokenAuthMiddleware, async (req, res, next) => {
+
+// Get Therapist by Id
+router
+  .route("/:therapistId")
+  .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+    try {
+      const therapist = await therapistModel
+        .findById(req.params.therapistId)
+        .select(["-appointments", "-__v"]);
+      res.send(therapist);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+// Get Profile (for) therapist + Edi name and Surname
+router.route("/me")
+  .get(tokenAuthMiddleware, async (req, res, next) => {
   try {
     res.send(req.user);
   } catch (error) {
     next(error);
   }
-});
+  })
+  .put(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      const updateTherapist = await therapistModel.findByIdAndUpdate(req.user._id, req.body, {new: true})
+      res.send(updateTherapist).status(200)
+    } catch (error) {
+      next(error);
+    }
+  });
 
+// Experiences (therapists only)
 router
   .route("/me/experiences")
   .get(tokenAuthMiddleware, async (req, res, next) => {
@@ -120,15 +149,20 @@ router
     }
   });
 
+// Change Avatar
 router.route("/me/avatar").post(tokenAuthMiddleware, therapistsOnly, multer({ storage: cloudStorage }).single("avatar"), async (req, res, next) => {
   try {
     // console.log(req.file)
-    const avatar = await therapistModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.file.path }}, {new: true})
-    console.log(avatar)
-    res.send(avatar)
+    const newTherapistAvatar = await therapistModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.file.path }}, {new: true})
+    // console.log(avatar)
+    res.send(newTherapistAvatar)
   } catch (error) {
     next(error)
   }
 })
+
+// Get all my Clients
+
+// Get single Client by id
 
 export default router;
