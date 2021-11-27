@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 import userModel from "./userBaseSchema.js"
 
 const { Schema } = mongoose;
@@ -18,8 +17,8 @@ export const therapistModel = userModel.discriminator(
       },
     ],
     appointments: [{ type: Schema.ObjectId, ref: "Appointment" }],
-    availableDays: [{ type: Date, required: true }],
-    specialization: { type: String, default: "Bingo Bongo" }
+    availableDays: [{ type: Date }],
+    specializations: [{ type: String, default: "Bingo Bongo" }]
     // specialization: { type: Schema.ObjectId, ref: "Specialization" }
   })
 );

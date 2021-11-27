@@ -1,24 +1,44 @@
 // ******************** PACKAGES ********************
 import express from "express";
 import createHttpError from "http-errors";
+import { validationResult } from "express-validator";
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary"
-import { CloudinaryStorage } from "multer-storage-cloudinary"
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 // ******************** MODELS ********************
 import experienceModel from "./experienceSchema.js";
 import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
+import { userValidation } from "../../middlewares/validation/userValidation.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
+// ******************** FUNCTIONS ********************
+import { generateToken } from "../../middlewares/auth/tokenAuth.js";
 
 const router = express.Router();
 
 const cloudStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: {
-      folder: "profilepictures",
+    folder: "profilepictures",
   },
-}) 
+});
+
+router.route("/register").post(userValidation, async (req, res, next) => {
+  try {
+    const errorsList = validationResult(req);
+    if (!errorsList.isEmpty()) {
+      next(createHttpError(400, { errorsList }));
+    } else {
+      const newTherapist = new therapistModel(req.body);
+      const { _id } = await newTherapist.save();
+      const accessToken = await generateToken(newTherapist);
+      res.status(201).send({ _id, accessToken });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 router
   .route("/")
@@ -93,22 +113,22 @@ router
         req.user._id,
         { $pull: { experiences: { _id: req.params.experienceId } } },
         { new: true }
-      )
-      res.send(therapist) 
+      );
+      res.send(therapist);
     } catch (error) {
-      next(error)
+      next(error);
     }
   });
 
-  // router.route("/me/avatar").put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-  //   try {
-  //     // console.log(req.file)
-  //     const avatar = await therapistModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.body }}, {new: true})
-  //     console.log(avatar)
-  //     res.send(avatar)
-  //   } catch (error) {
-  //     next(error)
-  //   }
-  // })
+router.route("/me/avatar").post(tokenAuthMiddleware, therapistsOnly, multer({ storage: cloudStorage }).single("avatar"), async (req, res, next) => {
+  try {
+    // console.log(req.file)
+    const avatar = await therapistModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.file.path }}, {new: true})
+    console.log(avatar)
+    res.send(avatar)
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default router;
