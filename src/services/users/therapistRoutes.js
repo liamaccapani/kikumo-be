@@ -11,7 +11,10 @@ import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
 import { userValidation } from "../../middlewares/validation/userValidation.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
-import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
+import {
+  clientsOnly,
+  therapistsOnly,
+} from "../../middlewares/auth/roleChecker.js";
 // ******************** FUNCTIONS ********************
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";
 
@@ -41,8 +44,7 @@ router.route("/register").post(userValidation, async (req, res, next) => {
   }
 });
 
-
-// Get all therapists (only for clients)
+// Get all Therapists (only for Clients)
 router
   .route("/")
   .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
@@ -56,38 +58,54 @@ router
     }
   });
 
-
-// Get Therapist by Id
+// Get Profile (for) Therapist + Edit name and surname
 router
-  .route("/:therapistId")
-  .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+  .route("/me")
+  .get(tokenAuthMiddleware, async (req, res, next) => {
     try {
-      const therapist = await therapistModel
-        .findById(req.params.therapistId)
-        .select(["-appointments", "-__v"]);
-      res.send(therapist);
+      res.send(req.user);
     } catch (error) {
+      console.log(error);
       next(error);
     }
-  });
-
-// Get Profile (for) therapist + Edi name and Surname
-router.route("/me")
-  .get(tokenAuthMiddleware, async (req, res, next) => {
-  try {
-    res.send(req.user);
-  } catch (error) {
-    next(error);
-  }
   })
   .put(tokenAuthMiddleware, async (req, res, next) => {
     try {
-      const updateTherapist = await therapistModel.findByIdAndUpdate(req.user._id, req.body, {new: true})
-      res.send(updateTherapist).status(200)
+      const updateTherapist = await therapistModel.findByIdAndUpdate(
+        req.user._id,
+        req.body,
+        { new: true }
+      );
+      res.send(updateTherapist).status(200);
     } catch (error) {
       next(error);
     }
   });
+
+// Get all my Clients
+
+// Change Avatar
+router
+  .route("/me/avatar")
+  .post(
+    tokenAuthMiddleware,
+    therapistsOnly,
+    multer({ storage: cloudStorage }).single("avatar"),
+    async (req, res, next) => {
+      try {
+        // console.log(req.file)
+        const newTherapistAvatar = await therapistModel.findByIdAndUpdate(
+          req.user._id,
+          { $set: { avatar: req.file.path } },
+          { new: true }
+        );
+        // console.log(avatar)
+        res.send(newTherapistAvatar);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 
 // Experiences (therapists only)
 router
@@ -113,6 +131,21 @@ router
     }
   });
 
+// Get Therapist by Id (only for Clients)
+router
+  .route("/:therapistId")
+  .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+    try {
+      const therapist = await therapistModel
+        .findById(req.params.therapistId)
+        .select(["-appointments", "-__v"]);
+      res.send(therapist);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+// Edit or Delete Experience
 router
   .route("/me/experiences/:experienceId")
   .put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
@@ -149,19 +182,6 @@ router
     }
   });
 
-// Change Avatar
-router.route("/me/avatar").post(tokenAuthMiddleware, therapistsOnly, multer({ storage: cloudStorage }).single("avatar"), async (req, res, next) => {
-  try {
-    // console.log(req.file)
-    const newTherapistAvatar = await therapistModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.file.path }}, {new: true})
-    // console.log(avatar)
-    res.send(newTherapistAvatar)
-  } catch (error) {
-    next(error)
-  }
-})
-
-// Get all my Clients
 
 // Get single Client by id
 

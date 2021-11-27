@@ -41,7 +41,7 @@ router.route("/register").post(userValidation, async (req, res, next) => {
   }
 });
 
-// Get Profile (for) therapist + Edi name and Surname
+// Get Profile (for) Client + Edit name and surname
 router.route("/me")
  .get(tokenAuthMiddleware, async (req, res, next) => {
   try {
