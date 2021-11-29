@@ -150,7 +150,8 @@ router.route("/:therapistId/appointments").post(tokenAuthMiddleware, async (req,
     
     if({_id}){
       try {
-      // NB Filter/ Find if clientId is altready in the array clients
+      // NB Filter / Find if clientId is already in the array clients
+      // NB Filter / Find if therapistId is already in the array therapists
       const newTherapist = await therapistModel.findById(req.params.therapistId)
       const newClient = await clientModel.findById(req.body.clientId)
 

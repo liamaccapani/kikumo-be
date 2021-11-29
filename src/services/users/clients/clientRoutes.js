@@ -85,17 +85,17 @@ router.route("/me/avatar").post(tokenAuthMiddleware, clientsOnly, multer({ stora
 })
 
 // Get Client by Id
-// router
-//   .route("/:clientId")
-//   .get(tokenAuthMiddleware, async (req, res, next) => {
-//     try {
-//       const client = await clientModel
-//         .findById(req.params.clientId)
-//         .select(["-appointments", "-__v"]);
-//       res.send(client);
-//     } catch (error) {
-//       next(error);
-//     }
-//   });
+router
+  .route("/:clientId")
+  .get(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      const client = await clientModel
+        .findById(req.params.clientId)
+        .select(["-appointments", "-__v"]);
+      res.send(client);
+    } catch (error) {
+      next(error);
+    }
+  });
 
 export default router;
