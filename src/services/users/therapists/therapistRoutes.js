@@ -117,7 +117,7 @@ router.route("/me/clients")
 
 // Get Therapist by Id 
 // + GET availability (separate route??) TO BE TESTED 🐲
-// + GET address TO BE TESTED 🐲
+// + GET address (separate route??) TO BE TESTED 🐲
 router
   .route("/:therapistId")
   .get(tokenAuthMiddleware, async (req, res, next) => {
@@ -131,7 +131,7 @@ router
     }
   });
 
-// POST therapistId/appointments by client TO BE TESTED 🐲
+// POST therapistId/appointments by client
 router.route("/:therapistId/appointments").post(tokenAuthMiddleware, async (req, res, next) => {
   try {
     // -> update appointments in both Client schema and Therapist Schema
