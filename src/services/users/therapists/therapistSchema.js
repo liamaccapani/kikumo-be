@@ -18,8 +18,7 @@ export const therapistModel = userModel.discriminator(
     ],
     appointments: [{ type: Schema.ObjectId, ref: "Appointment" }],
     availableDays: [{ type: Date }],
-    specializations: [{ type: String, default: "Bingo Bongo" }],
-    // specialization: { type: Schema.ObjectId, ref: "Specialization" }, 
+    specializations: { type: Schema.ObjectId, ref: "Specialization" }, 
     clients: [
       {
         name: String,

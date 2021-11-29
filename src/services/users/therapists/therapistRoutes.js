@@ -8,7 +8,7 @@ import { validationResult } from "express-validator";
 // ******************** MODELS ********************
 import appointmentModel from "../../appointments/schema.js"
 import { clientModel } from "../clients/clientSchema.js";
-import experienceModel from "../../experiences/experienceSchema.js";
+import specializationModel from "../../specializations/schema.js"
 import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
 import { clientsOnly, therapistsOnly,} from "../../../middlewares/auth/roleChecker.js";
@@ -43,14 +43,14 @@ router.route("/register").post(userValidation, async (req, res, next) => {
   }
 });
 
-// Get all Therapists (only for Clients)
+// Get all Therapists
 router
   .route("/")
   .get(tokenAuthMiddleware, async (req, res, next) => {
     try {
       const therapists = await therapistModel
         .find()
-        .select(["-appointments", "-__v"]);
+        .select(["-appointments", "-clients", "-__v"]);
       res.send(therapists);
     } catch (error) {
       next(error);
@@ -104,7 +104,7 @@ router
     }
   );
 
-// Get all my Clients TO BE TESTED, for now empty array because nobody is there 🐲
+// Get all my Clients (Is it necessary?)
 router.route("/me/clients")
   .get(tokenAuthMiddleware, async (req, res, next) => {
     try {
@@ -114,6 +114,20 @@ router.route("/me/clients")
       next(error);
     }
 })
+
+router.route("/me/specializations").put(tokenAuthMiddleware, async (req, res, next) => {
+  try {
+    const specialization = await specializationModel.findById(req.body.specializationId)
+    const addToMine = await therapistModel.findByIdAndUpdate(
+      req.user._id,
+      {$push: {specializations: specialization}},
+      {new: true}
+    ).populate("specializations")
+    res.send(addToMine)  
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Get Therapist by Id 
 // + GET availability (separate route??) TO BE TESTED 🐲
@@ -131,7 +145,7 @@ router
     }
   });
 
-// POST therapistId/appointments by client
+// POST therapistId/appointments by client + add appointments, therapist and client to therapist and client
 router.route("/:therapistId/appointments").post(tokenAuthMiddleware, async (req, res, next) => {
   try {
     // -> update appointments in both Client schema and Therapist Schema
