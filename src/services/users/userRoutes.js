@@ -1,16 +1,16 @@
 // ******************** PACKAGES ********************
-import express from "express";
-import createHttpError from "http-errors";
-import { validationResult } from "express-validator";
-import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import createHttpError from "http-errors";
+import express from "express";
+import multer from "multer";
+import { validationResult } from "express-validator";
 // ******************** MODELS ********************
 import userModel from "./userBaseSchema.js";
 // ******************** MIDDLEWARES ********************
-import { userValidation } from "../../middlewares/validation/userValidation.js";
-import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
+import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
+import { userValidation } from "../../middlewares/validation/userValidation.js";
 // ******************** FUNCTIONS ********************
 import { generateToken } from "../../middlewares/auth/tokenAuth.js";
 

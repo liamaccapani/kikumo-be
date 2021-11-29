@@ -1,14 +1,14 @@
 // ******************** PACKAGES ********************
-import express from "express"
-import mongoose from "mongoose"
 import cors from "cors"
+import express from "express"
 import listEndpoints from "express-list-endpoints"
+import mongoose from "mongoose"
 // ******************** ROUTERS ********************
+import clientsRouter from "../src/services/users/clients/clientRoutes.js"
+import therapistsRouter from "../src/services/users/therapists/therapistRoutes.js"
 import usersRouter from "../src/services/users/userRoutes.js"
-import clientsRouter from "../src/services/users/clientRoutes.js"
-import therapistsRouter from "../src/services/users/therapistRoutes.js"
 // ******************** ERROR HANDLERS ********************
-import { badRequest, unauthorized, forbidden, notFound, serverError} from "./errorHandlers.js"
+import { badRequest, forbidden, notFound, serverError, unauthorized } from "./errorHandlers.js"
 
 const server = express()
 const port = process.env.PORT || 3001

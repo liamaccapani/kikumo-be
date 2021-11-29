@@ -1,22 +1,21 @@
 // ******************** PACKAGES ********************
-import express from "express";
-import createHttpError from "http-errors";
-import { validationResult } from "express-validator";
-import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import createHttpError from "http-errors";
+import express from "express";
+import multer from "multer";
+import { validationResult } from "express-validator";
 // ******************** MODELS ********************
-import experienceModel from "./experienceSchema.js";
+import appointmentModel from "../../appointments/schema.js"
+import { clientModel } from "../clients/clientSchema.js";
+import experienceModel from "../../experiences/experienceSchema.js";
 import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
-import { userValidation } from "../../middlewares/validation/userValidation.js";
-import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
-import {
-  clientsOnly,
-  therapistsOnly,
-} from "../../middlewares/auth/roleChecker.js";
+import { clientsOnly, therapistsOnly,} from "../../../middlewares/auth/roleChecker.js";
+import { tokenAuthMiddleware } from "../../../middlewares/auth/tokenMiddleware.js";
+import { userValidation } from "../../../middlewares/validation/userValidation.js";
 // ******************** FUNCTIONS ********************
-import { generateToken } from "../../middlewares/auth/tokenAuth.js";
+import { generateToken } from "../../../middlewares/auth/tokenAuth.js";
 
 const router = express.Router();
 
@@ -82,8 +81,6 @@ router
     }
   });
 
-// Get all my Clients
-
 // Change Avatar
 router
   .route("/me/avatar")
@@ -107,34 +104,23 @@ router
     }
   );
 
-// Experiences (therapists only)
-router
-  .route("/me/experiences")
+// Get all my Clients TO BE TESTED, for now empty array because nobody is there 🐲
+router.route("/me/clients")
   .get(tokenAuthMiddleware, async (req, res, next) => {
     try {
-      res.send(req.user.experiences);
+      const myClients = req.user.clients
+      res.send(myClients);
     } catch (error) {
       next(error);
     }
-  })
-  .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-    try {
-      const newExperience = new experienceModel(req.body);
-      const updatedTherapist = await therapistModel.findByIdAndUpdate(
-        req.user._id,
-        { $push: { experiences: newExperience } },
-        { new: true }
-      );
-      res.send(updatedTherapist);
-    } catch (error) {
-      next(error);
-    }
-  });
+})
 
-// Get Therapist by Id (only for Clients)
+// Get Therapist by Id 
+// + GET availability (separate route??) TO BE TESTED 🐲
+// + GET address TO BE TESTED 🐲
 router
   .route("/:therapistId")
-  .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+  .get(tokenAuthMiddleware, async (req, res, next) => {
     try {
       const therapist = await therapistModel
         .findById(req.params.therapistId)
@@ -145,42 +131,51 @@ router
     }
   });
 
-// Edit or Delete Experience
-router
-  .route("/me/experiences/:experienceId")
-  .put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-    try {
-      const me = req.user;
-      // user is a MONGOOSE DOCUMENT not a normal plain JS object
-      const expIndex = me.experiences.findIndex(
-        (exp) => exp._id.toString() === req.params.experienceId
-      );
-      if (expIndex !== -1) {
-        me.experiences[expIndex] = {
-          ...me.experiences[expIndex].toObject(),
-          ...req.body,
-        };
-        await me.save();
-        res.send(me);
-      } else {
-        next(createHttpError(404, "Experience not found"));
+// POST therapistId/appointments by client TO BE TESTED 🐲
+router.route("/:therapistId/appointments").post(tokenAuthMiddleware, async (req, res, next) => {
+  try {
+    // -> update appointments in both Client schema and Therapist Schema
+    const newAppointment = new appointmentModel(req.body)
+    const { _id } = await newAppointment.save();
+    const clientAppointments = await clientModel.findByIdAndUpdate(
+      req.body.clientId,
+      { $push: { appointments: newAppointment } }, 
+      {new: true}
+    )
+    const therapistAppointments = await therapistModel.findByIdAndUpdate(
+      req.params.therapistId, 
+      { $push: { appointments: newAppointment } }, 
+      {new: true}
+    )
+    
+    if({_id}){
+      try {
+      // NB Filter/ Find if clientId is altready in the array clients
+      const newTherapist = await therapistModel.findById(req.params.therapistId)
+      const newClient = await clientModel.findById(req.body.clientId)
+
+      const addTherapistToMine = await clientModel.findByIdAndUpdate(
+        req.body.clientId, 
+        { $push: { therapists: newTherapist } },
+        {new: true}
+      )
+
+      const addClientToMine = await therapistModel.findByIdAndUpdate(
+        req.params.therapistId,
+        { $push: { clients: newClient } },
+        {new: true}
+      )
+      } catch (error) {
+        
       }
-    } catch (error) {
-      next(error);
     }
-  })
-  .delete(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-    try {
-      const therapist = await therapistModel.findByIdAndUpdate(
-        req.user._id,
-        { $pull: { experiences: { _id: req.params.experienceId } } },
-        { new: true }
-      );
-      res.send(therapist);
-    } catch (error) {
-      next(error);
-    }
-  });
+    
+    res.send({_id}).status(201)
+  } catch (error) {
+    next(error)
+  }
+});
+
 
 
 export default router;

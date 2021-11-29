@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import userModel from "./userBaseSchema.js"
+import userModel from "../userBaseSchema.js"
 
 const { Schema } = mongoose;
 
@@ -18,7 +18,14 @@ export const therapistModel = userModel.discriminator(
     ],
     appointments: [{ type: Schema.ObjectId, ref: "Appointment" }],
     availableDays: [{ type: Date }],
-    specializations: [{ type: String, default: "Bingo Bongo" }]
-    // specialization: { type: Schema.ObjectId, ref: "Specialization" }
+    specializations: [{ type: String, default: "Bingo Bongo" }],
+    // specialization: { type: Schema.ObjectId, ref: "Specialization" }, 
+    clients: [
+      {
+        name: String,
+        surname: String,
+      }
+    ],
+    // address: 
   })
 );
