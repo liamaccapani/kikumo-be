@@ -6,12 +6,16 @@ import express from "express";
 import multer from "multer";
 import { validationResult } from "express-validator";
 // ******************** MODELS ********************
-import appointmentModel from "../../appointments/schema.js"
+import appointmentModel from "../../appointments/schema.js";
 import { clientModel } from "../clients/clientSchema.js";
-import specializationModel from "../../specializations/schema.js"
+import experienceModel from "../../experiences/experienceSchema.js";
+import specializationModel from "../../specializations/schema.js";
 import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
-import { clientsOnly, therapistsOnly,} from "../../../middlewares/auth/roleChecker.js";
+import {
+  clientsOnly,
+  therapistsOnly,
+} from "../../../middlewares/auth/roleChecker.js";
 import { tokenAuthMiddleware } from "../../../middlewares/auth/tokenMiddleware.js";
 import { userValidation } from "../../../middlewares/validation/userValidation.js";
 // ******************** FUNCTIONS ********************
@@ -44,18 +48,16 @@ router.route("/register").post(userValidation, async (req, res, next) => {
 });
 
 // Get all Therapists
-router
-  .route("/")
-  .get(tokenAuthMiddleware, async (req, res, next) => {
-    try {
-      const therapists = await therapistModel
-        .find()
-        .select(["-appointments", "-clients", "-__v"]);
-      res.send(therapists);
-    } catch (error) {
-      next(error);
-    }
-  });
+router.route("/").get(tokenAuthMiddleware, async (req, res, next) => {
+  try {
+    const therapists = await therapistModel
+      .find()
+      .select(["-appointments", "-clients", "-__v"]);
+    res.send(therapists);
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Get Profile (for) Therapist + Edit name and surname
 router
@@ -105,31 +107,36 @@ router
   );
 
 // Get all my Clients (Is it necessary?)
-router.route("/me/clients")
-  .get(tokenAuthMiddleware, async (req, res, next) => {
-    try {
-      const myClients = req.user.clients
-      res.send(myClients);
-    } catch (error) {
-      next(error);
-    }
-})
-
-router.route("/me/specializations").put(tokenAuthMiddleware, async (req, res, next) => {
+router.route("/me/clients").get(tokenAuthMiddleware, async (req, res, next) => {
   try {
-    const specialization = await specializationModel.findById(req.body.specializationId)
-    const addToMine = await therapistModel.findByIdAndUpdate(
-      req.user._id,
-      {$push: {specializations: specialization}},
-      {new: true}
-    ).populate("specializations")
-    res.send(addToMine)  
+    const myClients = req.user.clients;
+    res.send(myClients);
   } catch (error) {
     next(error);
   }
 });
 
-// Get Therapist by Id 
+router
+  .route("/me/specializations")
+  .put(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      const specialization = await specializationModel.findById(
+        req.body.specializationId
+      );
+      const addToMine = await therapistModel
+        .findByIdAndUpdate(
+          req.user._id,
+          { $push: { specializations: specialization } },
+          { new: true }
+        )
+        .populate("specializations");
+      res.send(addToMine);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+// Get Therapist by Id
 // + GET availability (separate route??) TO BE TESTED 🐲
 // + GET address (separate route??) TO BE TESTED 🐲
 router
@@ -146,51 +153,111 @@ router
   });
 
 // POST therapistId/appointments by client + add appointments, therapist and client to therapist and client
-router.route("/:therapistId/appointments").post(tokenAuthMiddleware, async (req, res, next) => {
-  try {
-    // -> update appointments in both Client schema and Therapist Schema
-    const newAppointment = new appointmentModel(req.body)
-    const { _id } = await newAppointment.save();
-    const clientAppointments = await clientModel.findByIdAndUpdate(
-      req.body.clientId,
-      { $push: { appointments: newAppointment } }, 
-      {new: true}
-    )
-    const therapistAppointments = await therapistModel.findByIdAndUpdate(
-      req.params.therapistId, 
-      { $push: { appointments: newAppointment } }, 
-      {new: true}
-    )
-    
-    if({_id}){
-      try {
-      // NB Filter / Find if clientId is already in the array clients
-      // NB Filter / Find if therapistId is already in the array therapists
-      const newTherapist = await therapistModel.findById(req.params.therapistId)
-      const newClient = await clientModel.findById(req.body.clientId)
-
-      const addTherapistToMine = await clientModel.findByIdAndUpdate(
-        req.body.clientId, 
-        { $set: { therapist: newTherapist } },
-        {new: true}
-      )
-
-      const addClientToMine = await therapistModel.findByIdAndUpdate(
+router
+  .route("/:therapistId/appointments")
+  .post(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      // -> update appointments in both Client schema and Therapist Schema
+      const newAppointment = new appointmentModel(req.body);
+      const { _id } = await newAppointment.save();
+      const clientAppointments = await clientModel.findByIdAndUpdate(
+        req.body.clientId,
+        { $push: { appointments: newAppointment } },
+        { new: true }
+      );
+      const therapistAppointments = await therapistModel.findByIdAndUpdate(
         req.params.therapistId,
-        { $push: { clients: newClient } },
-        {new: true}
-      )
-      } catch (error) {
-        
+        { $push: { appointments: newAppointment } },
+        { new: true }
+      );
+
+      if ({ _id }) {
+        try {
+          // NB Filter / Find if clientId is already in the array clients
+          // NB Filter / Find if therapistId is already in the array therapists
+          const newTherapist = await therapistModel
+            .findById(req.params.therapistId)
+            .populate();
+          const addTherapistToMine = await clientModel.findByIdAndUpdate(
+            req.body.clientId,
+            { $set: { therapist: newTherapist } },
+            { new: true }
+          );
+
+          const newClient = await clientModel.findById(req.body.clientId);
+          const addClientToMine = await therapistModel.findByIdAndUpdate(
+            req.params.therapistId,
+            { $push: { clients: newClient } },
+            { new: true }
+          );
+        } catch (error) {
+          next(error);
+        }
       }
+      res.send({ _id }).status(201);
+    } catch (error) {
+      next(error);
     }
-    
-    res.send({_id}).status(201)
-  } catch (error) {
-    next(error)
-  }
-});
+  });
 
+router
+  .route("/me/experiences")
+  .get(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      res.send(req.user.experiences);
+    } catch (error) {
+      next(error);
+    }
+  })
+  .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
+    try {
+      const newExperience = new experienceModel(req.body);
+      const updatedTherapist = await therapistModel.findByIdAndUpdate(
+        req.user._id,
+        { $push: { experiences: newExperience } },
+        { new: true }
+      );
+      res.send(updatedTherapist);
+    } catch (error) {
+      next(error);
+    }
+  });
 
+// Edit or Delete Experience
+router
+  .route("/me/experiences/:experienceId")
+  .put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
+    try {
+      const me = req.user;
+      // user is a MONGOOSE DOCUMENT not a normal plain JS object
+      const expIndex = me.experiences.findIndex(
+        (exp) => exp._id.toString() === req.params.experienceId
+      );
+      if (expIndex !== -1) {
+        me.experiences[expIndex] = {
+          ...me.experiences[expIndex].toObject(),
+          ...req.body,
+        };
+        await me.save();
+        res.send(me);
+      } else {
+        next(createHttpError(404, "Experience not found"));
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+  .delete(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
+    try {
+      const therapist = await therapistModel.findByIdAndUpdate(
+        req.user._id,
+        { $pull: { experiences: { _id: req.params.experienceId } } },
+        { new: true }
+      );
+      res.send(therapist);
+    } catch (error) {
+      next(error);
+    }
+  });
 
 export default router;

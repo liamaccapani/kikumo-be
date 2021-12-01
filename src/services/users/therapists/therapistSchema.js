@@ -8,16 +8,6 @@ const { Schema } = mongoose;
 export const therapistModel = userModel.discriminator(
   "Therapist",
   new Schema({
-    // experiences: [
-    //   {
-    //     role: String,
-    //     company: String,
-    //     startDate: Date,
-    //     endDate: Date,
-    //     description: String,
-    //     area: String,
-    //   },
-    // ],
     experiences: [experienceSchema],
     appointments: [appointmentSchema],
     availableDays: [
