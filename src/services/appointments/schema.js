@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const appointmentSchema = new Schema(
+export const appointmentSchema = new Schema(
   {
     startDate: { type: String, required: true },
     endDate: { type: String, required: true },
