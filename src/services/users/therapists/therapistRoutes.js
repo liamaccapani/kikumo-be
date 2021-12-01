@@ -152,54 +152,6 @@ router
     }
   });
 
-// POST therapistId/appointments by client + add appointments, therapist and client to therapist and client
-router
-  .route("/:therapistId/appointments")
-  .post(tokenAuthMiddleware, async (req, res, next) => {
-    try {
-      // -> update appointments in both Client schema and Therapist Schema
-      const newAppointment = new appointmentModel(req.body);
-      const { _id } = await newAppointment.save();
-      const clientAppointments = await clientModel.findByIdAndUpdate(
-        req.body.clientId,
-        { $push: { appointments: newAppointment } },
-        { new: true }
-      );
-      const therapistAppointments = await therapistModel.findByIdAndUpdate(
-        req.params.therapistId,
-        { $push: { appointments: newAppointment } },
-        { new: true }
-      );
-
-      if ({ _id }) {
-        try {
-          // NB Filter / Find if clientId is already in the array clients
-          // NB Filter / Find if therapistId is already in the array therapists
-          const newTherapist = await therapistModel
-            .findById(req.params.therapistId)
-            .populate();
-          const addTherapistToMine = await clientModel.findByIdAndUpdate(
-            req.body.clientId,
-            { $set: { therapist: newTherapist } },
-            { new: true }
-          );
-
-          const newClient = await clientModel.findById(req.body.clientId);
-          const addClientToMine = await therapistModel.findByIdAndUpdate(
-            req.params.therapistId,
-            { $push: { clients: newClient } },
-            { new: true }
-          );
-        } catch (error) {
-          next(error);
-        }
-      }
-      res.send({ _id }).status(201);
-    } catch (error) {
-      next(error);
-    }
-  });
-
 router
   .route("/me/experiences")
   .get(tokenAuthMiddleware, async (req, res, next) => {

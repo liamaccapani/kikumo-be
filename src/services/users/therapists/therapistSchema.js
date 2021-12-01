@@ -21,6 +21,7 @@ export const therapistModel = userModel.discriminator(
       {
         name: String,
         surname: String,
+        avatar: String
       }
     ],
     address: {
