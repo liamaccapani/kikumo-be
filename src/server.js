@@ -4,10 +4,10 @@ import express from "express"
 import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
 // ******************** ROUTERS ********************
-import clientsRouter from "../src/services/users/clients/clientRoutes.js"
+import clientsRouter from "../src/services/users/clients/routes.js"
 import specializationsRouter from "../src/services/specializations/routes.js"
-import therapistsRouter from "../src/services/users/therapists/therapistRoutes.js"
-import usersRouter from "../src/services/users/userRoutes.js"
+import therapistsRouter from "./services/users/therapists/routes.js"
+import usersRouter from "./services/users/routes.js"
 // ******************** ERROR HANDLERS ********************
 import { badRequest, forbidden, notFound, serverError, unauthorized } from "./errorHandlers.js"
 
