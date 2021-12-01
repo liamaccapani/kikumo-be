@@ -1,9 +1,6 @@
 // ******************** PACKAGES ********************
-import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 import createHttpError from "http-errors";
 import express from "express";
-import multer from "multer";
 import { validationResult } from "express-validator";
 // ******************** MODELS ********************
 import appointmentModel from "../../appointments/schema.js";
@@ -22,13 +19,6 @@ import { userValidation } from "../../../middlewares/validation/userValidation.j
 import { generateToken } from "../../../middlewares/auth/tokenAuth.js";
 
 const router = express.Router();
-
-const cloudStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "profilepictures",
-  },
-});
 
 // Register
 router.route("/register").post(userValidation, async (req, res, next) => {
@@ -70,51 +60,16 @@ router
       next(error);
     }
   })
-  .put(tokenAuthMiddleware, async (req, res, next) => {
-    try {
-      const updateTherapist = await therapistModel.findByIdAndUpdate(
-        req.user._id,
-        req.body,
-        { new: true }
-      );
-      res.send(updateTherapist).status(200);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-// Change Avatar
-router
-  .route("/me/avatar")
-  .post(
-    tokenAuthMiddleware,
-    therapistsOnly,
-    multer({ storage: cloudStorage }).single("avatar"),
-    async (req, res, next) => {
-      try {
-        // console.log(req.file)
-        const newTherapistAvatar = await therapistModel.findByIdAndUpdate(
-          req.user._id,
-          { $set: { avatar: req.file.path } },
-          { new: true }
-        );
-        // console.log(avatar)
-        res.send(newTherapistAvatar);
-      } catch (error) {
-        next(error);
-      }
-    }
-  );
 
 // Get all my Clients (Is it necessary?)
-router.route("/me/clients").get(tokenAuthMiddleware, async (req, res, next) => {
-  try {
-    const myClients = req.user.clients;
-    res.send(myClients);
-  } catch (error) {
-    next(error);
-  }
-});
+// router.route("/me/clients").get(tokenAuthMiddleware, async (req, res, next) => {
+//   try {
+//     const myClients = req.user.clients;
+//     res.send(myClients);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 router
   .route("/me/specializations")
