@@ -11,6 +11,7 @@ export const clientModel = userModel.discriminator(
       {
         name: String,
         surname: String,
+        avatar: String
       },
   })
 );

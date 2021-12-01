@@ -171,7 +171,7 @@ router.route("/:therapistId/appointments").post(tokenAuthMiddleware, async (req,
 
       const addTherapistToMine = await clientModel.findByIdAndUpdate(
         req.body.clientId, 
-        { $push: { therapists: newTherapist } },
+        { $set: { therapist: newTherapist } },
         {new: true}
       )
 
