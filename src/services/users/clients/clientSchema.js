@@ -7,11 +7,10 @@ export const clientModel = userModel.discriminator(
   "Client",
   new Schema({
     appointments: [{ type: Schema.ObjectId, ref: "Appointment" }],
-    therapists: [
+    therapist: 
       {
         name: String,
         surname: String,
-      }
-    ],
+      },
   })
 );
