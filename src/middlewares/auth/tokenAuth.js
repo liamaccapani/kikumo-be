@@ -6,7 +6,7 @@ export const JWTGenerateToken = (payload) =>
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "1h" },
+      { expiresIn: "3h" },
       (error, token) => {
         if (error) reject(error);
         else resolve(token);
