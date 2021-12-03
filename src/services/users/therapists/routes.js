@@ -54,7 +54,10 @@ router
   .route("/me")
   .get(tokenAuthMiddleware, async (req, res, next) => {
     try {
-      res.send(req.user);
+      const therapist = await therapistModel
+      .findById(req.user._id)
+      .populate("appointments");
+      res.send(therapist);
     } catch (error) {
       console.log(error);
       next(error);

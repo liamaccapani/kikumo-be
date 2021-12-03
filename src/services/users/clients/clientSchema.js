@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import userModel from "../userBaseSchema.js"
-import {appointmentSchema} from "../../appointments/schema.js"
 
 const { Schema } = mongoose;
 
