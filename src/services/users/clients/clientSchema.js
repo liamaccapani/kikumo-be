@@ -7,13 +7,7 @@ const { Schema } = mongoose;
 export const clientModel = userModel.discriminator(
   "Client",
   new Schema({
-    appointments: [appointmentSchema],
-    therapist: 
-      {
-        _id: String,
-        name: String,
-        surname: String,
-        avatar: String
-      },
+    appointments: [{type: Schema.ObjectId, ref: "Appointment" }],
+    therapists: [{type: Schema.ObjectId, ref: "Therapist" }]
   })
 );

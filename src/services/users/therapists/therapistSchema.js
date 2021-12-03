@@ -17,13 +17,7 @@ export const therapistModel = userModel.discriminator(
       }
     ],
     specializations: { type: Schema.ObjectId, ref: "Specialization" }, 
-    clients: [
-      {
-        name: String,
-        surname: String,
-        avatar: String
-      }
-    ],
+    clients: [{type: Schema.ObjectId, ref: "Client" }],
     address: {
       buildingName: { type: String },
       buildingNumber: { type: Number },

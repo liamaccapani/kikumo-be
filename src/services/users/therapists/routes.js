@@ -124,6 +124,30 @@ router
         { $push: { experiences: newExperience } },
         { new: true }
       );
+      const { _id } = await newExperience.save();
+      res.send(updatedTherapist);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router
+  .route("/me/availability")
+  .get(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      res.send(req.user.availableDays);
+    } catch (error) {
+      next(error);
+    }
+  })
+  .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
+    try {
+      const newDay = new Date(req.body);
+      const updatedTherapist = await therapistModel.findByIdAndUpdate(
+        req.user._id,
+        { $push: { availableDays: newDay } },
+        { new: true }
+      );
       res.send(updatedTherapist);
     } catch (error) {
       next(error);

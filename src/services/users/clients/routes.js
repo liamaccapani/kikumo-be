@@ -61,35 +61,35 @@ router.route("/me")
 router.route("/me/appointments/:therapistId").post(tokenAuthMiddleware, async (req, res, next) => {
   try {
     // -> update appointments in both Client schema and Therapist Schema
-    const newAppointment = new appointmentModel(req.body);
+    const newAppointment = new appointmentModel({...req.body, clientId: req.user._id, therapistId: req.params.therapistId});
     const { _id } = await newAppointment.save();
-    const clientAppointments = await clientModel.findByIdAndUpdate(
-      req.user._id,
-      { $push: { appointments: newAppointment } },
-      { new: true }
-    );
-    const therapistAppointments = await therapistModel.findByIdAndUpdate(
-      req.params.therapistId,
-      { $push: { appointments: newAppointment } },
-      { new: true }
-    );
+    // const clientAppointments = await clientModel.findByIdAndUpdate(
+    //   req.user._id,
+    //   { $push: { appointments: newAppointment } },
+    //   { new: true }
+    // );
+    // const therapistAppointments = await therapistModel.findByIdAndUpdate(
+    //   req.params.therapistId,
+    //   { $push: { appointments: newAppointment } },
+    //   { new: true }
+    // );
 
-    if ({ _id }) {
-      const newTherapist = await therapistModel.findById(req.params.therapistId);
-      const newClient = await clientModel.findById(req.user._id);
+    // if ({ _id }) {
+    //   const newTherapist = await therapistModel.findById(req.params.therapistId);
+    //   const newClient = await clientModel.findById(req.user._id);
 
-      const addTherapistToMine = await clientModel.findByIdAndUpdate(
-        req.user._id,
-        { $set: { therapist: newTherapist } },
-        { new: true }
-      );
+    //   const addTherapistToMine = await clientModel.findByIdAndUpdate(
+    //     req.user._id,
+    //     { $set: { therapist: newTherapist } },
+    //     { new: true }
+    //   );
       
-      const addClientToMine = await therapistModel.findByIdAndUpdate(
-        req.params.therapistId,
-        { $push: { clients: newClient } },
-        { new: true }
-      );
-    }
+    //   const addClientToMine = await therapistModel.findByIdAndUpdate(
+    //     req.params.therapistId,
+    //     { $push: { clients: newClient } },
+    //     { new: true }
+    //   );
+    // }
     res.send({ _id }).status(201);
   } catch (error) {
     next(error);
