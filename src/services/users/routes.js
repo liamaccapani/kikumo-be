@@ -29,7 +29,12 @@ router.route("/login").post(async (req, res, next) => {
     const user = await userModel.checkCredentials(email, password);
     if (user) {
       const accessToken = await generateToken(user);
-      res.send({ accessToken });
+      const body = {
+        accessToken,
+        role: user.role
+      }
+      console.log(user)
+      res.send(body);
     } else {
       next(createHttpError(401, "Credentials not correct"));
     }
