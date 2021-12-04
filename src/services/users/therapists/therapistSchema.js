@@ -7,22 +7,17 @@ const { Schema } = mongoose;
 export const therapistModel = userModel.discriminator(
   "Therapist",
   new Schema({
-    experiences: [experienceSchema],
-    appointments: [{type: Schema.ObjectId, ref: "Appointment" }],
-    availableDays: [
-      {
-        start: {type: Date},
-        end: {type: Date }
-      }
-    ],
-    specializations: [{ type: Schema.ObjectId, ref: "Specialization" }], 
-    clients: [{type: Schema.ObjectId, ref: "Client" }],
     address: {
       buildingName: { type: String },
       buildingNumber: { type: Number },
       city: { type: String },
       state: { type: String },
       zipCode: { type: Number }
-    }
+    }, 
+    experiences: [experienceSchema],
+    hourFee: { type: Number, default: 0 },
+    specializations: [{ type: Schema.ObjectId, ref: "Specialization" }], 
+    // appointments: [{type: Schema.ObjectId, ref: "Appointment" }],
+    // clients: [{type: Schema.ObjectId, ref: "Client" }],
   })
 );

@@ -3,8 +3,8 @@ import createHttpError from "http-errors";
 import express from "express";
 import { validationResult } from "express-validator";
 // ******************** MODELS ********************
-import appointmentModel from "../../appointments/schema.js";
 import { clientModel } from "./clientSchema.js";
+import sessionModel from "../../sessions/schema.js";
 import { therapistModel } from "../therapists/therapistSchema.js";
 // ******************** MIDDLEWARES ********************
 import {
@@ -52,7 +52,7 @@ router
   .post(tokenAuthMiddleware, async (req, res, next) => {
     try {
       // -> update appointments in both Client schema and Therapist Schema
-      const newAppointment = new appointmentModel({
+      const newAppointment = new sessionModel({
         ...req.body,
         clientId: req.user._id,
         therapistId: req.params.therapistId,

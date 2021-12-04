@@ -5,6 +5,7 @@ import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
 // ******************** ROUTERS ********************
 import clientsRouter from "../src/services/users/clients/routes.js"
+import sessionsRouter from "./services/sessions/routes.js"
 import specializationsRouter from "../src/services/specializations/routes.js"
 import therapistsRouter from "./services/users/therapists/routes.js"
 import usersRouter from "./services/users/routes.js"
@@ -35,6 +36,7 @@ server.use(express.json())
 
 
 // ******************** ROUTES ********************
+server.use("/sessions", sessionsRouter)
 server.use("/clients", clientsRouter)
 server.use("/specializations", specializationsRouter)
 server.use("/therapists", therapistsRouter)

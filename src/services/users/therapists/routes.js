@@ -3,9 +3,9 @@ import createHttpError from "http-errors";
 import express from "express";
 import { validationResult } from "express-validator";
 // ******************** MODELS ********************
-import appointmentModel from "../../appointments/schema.js";
 import { clientModel } from "../clients/clientSchema.js";
 import experienceModel from "../../experiences/experienceSchema.js";
+import sessionModel from "../../sessions/schema.js";
 import specializationModel from "../../specializations/schema.js";
 import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
