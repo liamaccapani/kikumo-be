@@ -4,7 +4,7 @@ import express from "express";
 // ******************** MODELS ********************
 import sessionModel from "./schema.js";
 // ******************** MIDDLEWARES ********************
-import { therapistsOnly } from "../../middlewares/auth/roleChecker.js";
+import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 
 const router = express.Router();
@@ -61,6 +61,14 @@ router
     }
   });
 
+router.route("/clientSession").get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+  try {
+    const myAppointments = await sessionModel.find({clientId: req.user._id}).populate('therapistId')
+    res.send(myAppointments).status(200)
+  } catch (error) {
+    next(error)
+  }
+})
 // GET /:sessionId => get specific available session
 router
   .route("/:sessionId")
