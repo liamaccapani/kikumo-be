@@ -4,26 +4,23 @@ import express from "express";
 // ******************** MODELS ********************
 import sessionModel from "./schema.js";
 // ******************** MIDDLEWARES ********************
-import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
+import {
+  clientsOnly,
+  therapistsOnly,
+} from "../../middlewares/auth/roleChecker.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 
 const router = express.Router();
 
-// NEEDED ROUTES:
-// POST -> by therapist to create available spots /sessions
-// GET -> to get available spots for a specific therapist /sessions/:therapistId
-// PUT -> by client to book a session with a specific therapist (set clientId, description ecc)
-// /sessions/book/:sessionId
-// PUT -> by therapist to edit something in specific session /sessions/:sessionId
-// DELETE -> by therapist to delete specific session /session/:sessionId
-
-// GET /sessions => get own sessions (where therapistId = req.user_id)
+// GET /sessions => therapist gets own sessions (where therapistId = req.user_id)
 router
   .route("/")
   .get(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-    const therapistAvailability = await sessionModel.find({
-      therapistId: req.user._id,
-    }).populate('clientId');
+    const therapistAvailability = await sessionModel
+      .find({
+        therapistId: req.user._id,
+      })
+      .populate("clientId");
     res.send(therapistAvailability);
   })
 // POST /sessions => the therapist (req.user._id) creates available sessions
@@ -40,6 +37,20 @@ router
     }
   });
 
+// GET /clientSessions => client gets own sessions ( where clientId = req.user._id)
+router
+  .route("/clients")
+  .get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
+    try {
+      const myAppointments = await sessionModel
+        .find({ clientId: req.user._id })
+        .populate("therapistId");
+      res.send(myAppointments).status(200);
+    } catch (error) {
+      next(error);
+    }
+  });
+
 // PUT /book/:sessionId => client edits a specific session by setting client id to req.user._id
 router
   .route("/book/:sessionId")
@@ -50,7 +61,7 @@ router
         {
           $set: {
             clientId: req.user._id,
-            ...req.body
+            ...req.body,
           },
         },
         { new: true }
@@ -61,22 +72,14 @@ router
     }
   });
 
-router.route("/clientSession").get(tokenAuthMiddleware, clientsOnly, async (req, res, next) => {
-  try {
-    const myAppointments = await sessionModel.find({clientId: req.user._id}).populate('therapistId')
-    res.send(myAppointments).status(200)
-  } catch (error) {
-    next(error)
-  }
-})
-// GET /:sessionId => get specific available session
+// GET /:sessionId => get specific session
 router
   .route("/:sessionId")
   .get(tokenAuthMiddleware, async (req, res, next) => {
-    const session = await sessionModel.findById(req.params.sessionId);
+    const session = await sessionModel.findById(req.params.sessionId).populate(['clientId', 'therapistId']);
     res.send(session);
   })
-  // PUT /:sessionId => therapist edits something in specific session
+// PUT /:sessionId => therapist edits something in specific session
   .put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
       // -> update appointments in both Client schema and Therapist Schema
@@ -90,7 +93,7 @@ router
       next(error);
     }
   })
-  // DELETE /:sessionId => therapist deletes specific session
+// DELETE /:sessionId => therapist deletes specific session
   .delete(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
       const deleteSession = await sessionModel.findByIdAndDelete(
