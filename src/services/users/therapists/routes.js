@@ -20,7 +20,7 @@ import { generateToken } from "../../../middlewares/auth/tokenAuth.js";
 
 const router = express.Router();
 
-// Register
+// POST => Register
 router.route("/register").post(userValidation, async (req, res, next) => {
   try {
     const errorsList = validationResult(req);
@@ -37,19 +37,20 @@ router.route("/register").post(userValidation, async (req, res, next) => {
   }
 });
 
-// Get all Therapists
+// GET all Therapists
 router.route("/").get(tokenAuthMiddleware, async (req, res, next) => {
   try {
     const therapists = await therapistModel
       .find()
-      .select(["-appointments", "-clients", "-__v"]);
+      .select(["-appointments", "-clients", "-__v"])
+      .populate('specializations');
     res.send(therapists);
   } catch (error) {
     next(error);
   }
 });
 
-// Get Profile (for) Therapist + Edit name and surname
+// GET Profile (for) Therapist
 router
   .route("/me")
   .get(tokenAuthMiddleware, async (req, res, next) => {
@@ -64,16 +65,7 @@ router
     }
   })
 
-// Get all my Clients (Is it necessary?)
-// router.route("/me/clients").get(tokenAuthMiddleware, async (req, res, next) => {
-//   try {
-//     const myClients = req.user.clients;
-//     res.send(myClients);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
+// PUT => edit own specialization by adding one to array
 router
   .route("/me/specializations")
   .put(tokenAuthMiddleware, async (req, res, next) => {
@@ -87,7 +79,7 @@ router
           { $push: { specializations: specialization } },
           { new: true }
         )
-        .populate("specializations");
+        .populate('specializations');
       res.send(addToMine);
     } catch (error) {
       next(error);

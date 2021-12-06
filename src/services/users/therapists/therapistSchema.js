@@ -16,8 +16,6 @@ export const therapistModel = userModel.discriminator(
     }, 
     experiences: [experienceSchema],
     hourFee: { type: Number, default: 0 },
-    specializations: [{ type: Schema.ObjectId, ref: "Specialization" }], 
-    // appointments: [{type: Schema.ObjectId, ref: "Appointment" }],
-    // clients: [{type: Schema.ObjectId, ref: "Client" }],
+    specializations: [{ type: Schema.ObjectId, ref: "Specialization" }]
   })
 );
