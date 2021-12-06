@@ -9,6 +9,7 @@ export const sessionSchema = new Schema(
     description: { type: String }, 
     duration: { type: String, required: true },
     startDate: { type: Date, required: true },
+    price: { type: Number }
   },
   { timestamps: true }
 );

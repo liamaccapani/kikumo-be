@@ -17,7 +17,7 @@ const router = express.Router();
 // PUT -> by therapist to edit something in specific session /sessions/:sessionId
 // DELETE -> by therapist to delete specific session /session/:sessionId
 
-// GET /sessions => finds all the available sessions by user Id of therapist
+// GET /sessions => get own sessions (where therapistId = req.user_id)
 router
   .route("/")
   .get(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
@@ -26,8 +26,8 @@ router
     });
     res.send(therapistAvailability);
   })
-  // POST /sessions => the therapist creates some available sessions
-  .post(tokenAuthMiddleware, async (req, res, next) => {
+// POST /sessions => the therapist (req.user._id) creates available sessions
+  .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
       const availability = new sessionModel({
         ...req.body,
@@ -40,6 +40,7 @@ router
     }
   });
 
+// PUT /book/:sessionId => client edits a specific session by setting client id to req.user._id
 router
   .route("/book/:sessionId")
   .put(tokenAuthMiddleware, async (req, res, next) => {
@@ -49,8 +50,7 @@ router
         {
           $set: {
             clientId: req.user._id,
-            description: req.body,
-            duration: req.body,
+            ...req.body
           },
         },
         { new: true }
@@ -61,15 +61,15 @@ router
     }
   });
 
-// GET /:sessionId => get specific available sessions
+// GET /:sessionId => get specific available session
 router
   .route("/:sessionId")
   .get(tokenAuthMiddleware, async (req, res, next) => {
     const session = await sessionModel.findById(req.params.sessionId);
     res.send(session);
   })
-  // PUT /:sessionId =>
-  .put(tokenAuthMiddleware, async (req, res, next) => {
+  // PUT /:sessionId => therapist edits something in specific session
+  .put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
       // -> update appointments in both Client schema and Therapist Schema
       const editedSession = await sessionModel.findByIdAndUpdate(
@@ -82,7 +82,8 @@ router
       next(error);
     }
   })
-  .delete(tokenAuthMiddleware, async (req, res, next) => {
+  // DELETE /:sessionId => therapist deletes specific session
+  .delete(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
       const deleteSession = await sessionModel.findByIdAndDelete(
         req.params.sessionId

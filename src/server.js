@@ -18,16 +18,16 @@ const port = process.env.PORT || 3001
 // ******************** CORS ********************
 const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
 const corsOpts = {
-    origin: function (origin, next) {
-        console.log("CURRENT ORIGIN: ", origin)
-        if (!origin || whitelist.indexOf(origin) !== -1) {
-            // if received origin is in the whitelist we are going to allow that request
-            next(null, true)
-        } else {
-            // if it is not, we are going to reject that request
-            next(new Error(`Origin ${origin} not allowed!`))
-        }
-    },
+  origin: function (origin, next) {
+      console.log("CURRENT ORIGIN: ", origin)
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+          // if received origin is in the whitelist we are going to allow that request
+          next(null, true)
+      } else {
+          // if it is not, we are going to reject that request
+          next(new Error(`Origin ${origin} not allowed!`))
+      }
+  },
 }
 
 // ******************** MIDDLEWARES ********************
@@ -36,8 +36,8 @@ server.use(express.json())
 
 
 // ******************** ROUTES ********************
-server.use("/sessions", sessionsRouter)
 server.use("/clients", clientsRouter)
+server.use("/sessions", sessionsRouter)
 server.use("/specializations", specializationsRouter)
 server.use("/therapists", therapistsRouter)
 server.use("/users", usersRouter)
