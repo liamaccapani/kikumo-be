@@ -23,7 +23,7 @@ router
   .get(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     const therapistAvailability = await sessionModel.find({
       therapistId: req.user._id,
-    });
+    }).populate('clientId');
     res.send(therapistAvailability);
   })
 // POST /sessions => the therapist (req.user._id) creates available sessions

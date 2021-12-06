@@ -14,4 +14,4 @@ export const sessionSchema = new Schema(
   { timestamps: true }
 );
 
-export default model("Appointment", sessionSchema);
+export default model("Session", sessionSchema);
