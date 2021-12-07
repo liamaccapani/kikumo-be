@@ -40,41 +40,40 @@ router.route("/me").get(tokenAuthMiddleware, async (req, res, next) => {
   try {
     const client = await clientModel
       .findById(req.user._id)
-      .populate("appointments");
     res.send(client);
   } catch (error) {
     next(error);
   }
 });
 
-router
-  .route("/me/appointments/:therapistId")
-  .post(tokenAuthMiddleware, async (req, res, next) => {
-    try {
-      // -> update appointments in both Client schema and Therapist Schema
-      const newAppointment = new sessionModel({
-        ...req.body,
-        clientId: req.user._id,
-        therapistId: req.params.therapistId,
-      });
+// router
+//   .route("/me/appointments/:therapistId")
+//   .post(tokenAuthMiddleware, async (req, res, next) => {
+//     try {
+//       // -> update appointments in both Client schema and Therapist Schema
+//       const newAppointment = new sessionModel({
+//         ...req.body,
+//         clientId: req.user._id,
+//         therapistId: req.params.therapistId,
+//       });
 
-      const updateTherapist = await therapistModel.findByIdAndUpdate(
-        req.params.therapistId,
-        { $push: { appointments: newAppointment } },
-        { new: true }
-      );
+//       const updateTherapist = await therapistModel.findByIdAndUpdate(
+//         req.params.therapistId,
+//         { $push: { appointments: newAppointment } },
+//         { new: true }
+//       );
 
-      const updateClient = await clientModel.findByIdAndUpdate(
-        req.user._id,
-        { $push: { appointments: newAppointment } },
-        { new: true }
-      );
-      const { _id } = await newAppointment.save();
-      res.send({ _id }).status(201);
-    } catch (error) {
-      next(error);
-    }
-  });
+//       const updateClient = await clientModel.findByIdAndUpdate(
+//         req.user._id,
+//         { $push: { appointments: newAppointment } },
+//         { new: true }
+//       );
+//       const { _id } = await newAppointment.save();
+//       res.send({ _id }).status(201);
+//     } catch (error) {
+//       next(error);
+//     }
+//   });
 
 // Get Client by Id
 router.route("/:clientId").get(tokenAuthMiddleware, async (req, res, next) => {

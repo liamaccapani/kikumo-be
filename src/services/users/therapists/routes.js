@@ -57,7 +57,7 @@ router
     try {
       const therapist = await therapistModel
       .findById(req.user._id)
-      .populate("appointments");
+      .populate("specializations");
       res.send(therapist);
     } catch (error) {
       console.log(error);
@@ -126,28 +126,28 @@ router
     }
   });
 
-  router
-  .route("/me/availability")
-  .get(tokenAuthMiddleware, async (req, res, next) => {
-    try {
-      res.send(req.user.availableDays);
-    } catch (error) {
-      next(error);
-    }
-  })
-  .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-    try {
-      const newDay = new Date(req.body);
-      const updatedTherapist = await therapistModel.findByIdAndUpdate(
-        req.user._id,
-        { $push: { availableDays: newDay } },
-        { new: true }
-      );
-      res.send(updatedTherapist);
-    } catch (error) {
-      next(error);
-    }
-  });
+  // router
+  // .route("/me/availability")
+  // .get(tokenAuthMiddleware, async (req, res, next) => {
+  //   try {
+  //     res.send(req.user.availableDays);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // })
+  // .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
+  //   try {
+  //     const newDay = new Date(req.body);
+  //     const updatedTherapist = await therapistModel.findByIdAndUpdate(
+  //       req.user._id,
+  //       { $push: { availableDays: newDay } },
+  //       { new: true }
+  //     );
+  //     res.send(updatedTherapist);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // });
 
 // Edit or Delete Experience
 router
