@@ -13,8 +13,8 @@ router.route("/addEvent").post(tokenAuthMiddleware, async (req, res, next) => {
       ...req.body,
       therapistId: req.user._id,
     });
-    const { _id } = await newSession.save();
-    res.send({_id}).status(201)
+    const session = await newSession.save();
+    res.send(session).status(201)
   } catch (error) {
     next(error);
   }
