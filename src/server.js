@@ -9,6 +9,8 @@ import sessionsRouter from "./services/sessions/routes.js"
 import specializationsRouter from "../src/services/specializations/routes.js"
 import therapistsRouter from "./services/users/therapists/routes.js"
 import usersRouter from "./services/users/routes.js"
+
+import sessionTestRouter from "./services/testSessions/routes.js"
 // ******************** ERROR HANDLERS ********************
 import { badRequest, forbidden, notFound, serverError, unauthorized } from "./errorHandlers.js"
 
@@ -41,6 +43,8 @@ server.use("/sessions", sessionsRouter)
 server.use("/specializations", specializationsRouter)
 server.use("/therapists", therapistsRouter)
 server.use("/users", usersRouter)
+
+server.use("/test", sessionTestRouter)
 
 
 // ******************** ERROR HANDLERS ********************
