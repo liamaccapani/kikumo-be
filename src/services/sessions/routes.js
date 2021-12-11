@@ -72,6 +72,19 @@ router
     }
   });
 
+// GET /sessions/:therapistId => client gets all sessions available for a specific therapist
+router.route("/:therapistId").get(tokenAuthMiddleware, async (req, res, next) => {
+  try {
+    const therapistSessions = await sessionModel.find(
+      {therapistId: req.params.therapistId}
+    )
+    res.send(therapistSessions);
+  } catch (error) {
+    next(error);
+  }
+})
+
+
 // GET /:sessionId => get specific session
 router
   .route("/:sessionId")
