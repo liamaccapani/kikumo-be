@@ -31,7 +31,8 @@ router.route("/login").post(async (req, res, next) => {
       const accessToken = await generateToken(user);
       const body = {
         accessToken,
-        role: user.role
+        role: user.role,
+        _id: user._id
       }
       console.log(user)
       res.send(body);
