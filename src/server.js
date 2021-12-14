@@ -54,7 +54,7 @@ server.use(forbidden)
 server.use(notFound)
 server.use(serverError)
 
-console.table(listEndpoints(server))
+// console.table(listEndpoints(server))
 
 mongoose.connect(process.env.MONGO_CONNECTION)
 

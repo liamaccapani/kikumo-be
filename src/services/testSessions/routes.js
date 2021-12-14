@@ -44,10 +44,10 @@ router.route("/getEvent").get(tokenAuthMiddleware, async (req, res, next) => {
       next(error);
     }
   })
-  .post(tokenAuthMiddleware, async (req, res, next) => {
+  .put(tokenAuthMiddleware, async (req, res, next) => {
     try {
       const sessionToBook = await sessionTestModel.findByIdAndUpdate(
-        req.body.sessionId,
+        req.params.sessionId,
         {
           $set: {
             clientId: req.user._id,
@@ -56,6 +56,8 @@ router.route("/getEvent").get(tokenAuthMiddleware, async (req, res, next) => {
         },
         { new: true }
       );
+      // console.log(sessionToBook)
+      res.send(sessionToBook).status(200)
     } catch (error) {
       next(error);
     }
