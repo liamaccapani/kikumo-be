@@ -30,4 +30,34 @@ router.route("/getEvent").get(tokenAuthMiddleware, async (req, res, next) => {
       next(error);
     }
   });
+
+
+  router
+  .route("/book/:sessionId")
+  .get(tokenAuthMiddleware, async (req, res, next) =>{
+    try {
+      const sessionToBook = await sessionTestModel.findById(
+        req.body.sessionId,
+      );
+      res.send(sessionToBook).status(200);
+    } catch (error) {
+      next(error);
+    }
+  })
+  .post(tokenAuthMiddleware, async (req, res, next) => {
+    try {
+      const sessionToBook = await sessionTestModel.findByIdAndUpdate(
+        req.body.sessionId,
+        {
+          $set: {
+            clientId: req.user._id,
+            ...req.body,
+          },
+        },
+        { new: true }
+      );
+    } catch (error) {
+      next(error);
+    }
+  });
 export default router;
