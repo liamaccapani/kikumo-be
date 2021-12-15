@@ -16,22 +16,22 @@ const router = express.Router();
 router
   .route("/")
   .get(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-    const therapistAvailability = await sessionModel
+    const sessions = await sessionModel
       .find({
         therapistId: req.user._id,
       })
       .populate("clientId");
-    res.send(therapistAvailability);
+    res.send(sessions);
   })
 // POST /sessions => the therapist (req.user._id) creates available sessions
   .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
-      const availability = new sessionModel({
+      const newSession = new sessionModel({
         ...req.body,
         therapistId: req.user._id,
       });
-      const { _id } = await availability.save();
-      res.send({ _id }).status(201);
+      const session = await newSession.save();
+      res.send(session).status(201);
     } catch (error) {
       next(error);
     }

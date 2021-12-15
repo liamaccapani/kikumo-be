@@ -6,9 +6,9 @@ export const sessionSchema = new Schema(
   {
     clientId: { type: Schema.ObjectId, ref: "Client" },
     therapistId: { type: Schema.ObjectId, ref: "Therapist" },
-    description: { type: String }, 
-    duration: { type: String, required: true },
-    startDate: { type: Date, required: true },
+    title: { type: String }, 
+    start: { type: Date, required: true },
+    end: { type: Date, required: true },
   },
   { timestamps: true }
 );
