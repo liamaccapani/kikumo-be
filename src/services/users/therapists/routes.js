@@ -95,7 +95,8 @@ router
     try {
       const therapist = await therapistModel
         .findById(req.params.therapistId)
-        .select(["-appointments", "-__v"]);
+        .populate("specializations")
+        // .select(["-appointments", "-__v"]);
       res.send(therapist);
     } catch (error) {
       next(error);
