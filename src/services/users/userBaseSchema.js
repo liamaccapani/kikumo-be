@@ -49,7 +49,6 @@ userSchema.methods.toJSON = function () {
 // #2 compare password with hashed one
 userSchema.statics.checkCredentials = async function (email, password) {
   const user = await this.findOne({ email });
-
   if (user) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {

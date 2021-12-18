@@ -1,7 +1,6 @@
 // ******************** PACKAGES ********************
 import cors from "cors"
 import express from "express"
-import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
 // ******************** ROUTERS ********************
 import clientsRouter from "../src/services/users/clients/routes.js"
@@ -9,8 +8,6 @@ import sessionsRouter from "./services/sessions/routes.js"
 import specializationsRouter from "../src/services/specializations/routes.js"
 import therapistsRouter from "./services/users/therapists/routes.js"
 import usersRouter from "./services/users/routes.js"
-
-import sessionTestRouter from "./services/testSessions/routes.js"
 // ******************** ERROR HANDLERS ********************
 import { badRequest, forbidden, notFound, serverError, unauthorized } from "./errorHandlers.js"
 
@@ -43,8 +40,6 @@ server.use("/specializations", specializationsRouter)
 server.use("/therapists", therapistsRouter)
 server.use("/users", usersRouter)
 
-server.use("/test", sessionTestRouter)
-
 
 // ******************** ERROR HANDLERS ********************
 server.use(badRequest)
@@ -53,7 +48,6 @@ server.use(forbidden)
 server.use(notFound)
 server.use(serverError)
 
-// console.table(listEndpoints(server))
 
 mongoose.connect(process.env.MONGO_CONNECTION)
 

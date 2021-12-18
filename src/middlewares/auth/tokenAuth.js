@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 
-// generates token: payload + secret string + options (expiresIn)
 export const JWTGenerateToken = (payload) =>
   new Promise((resolve, reject) =>
     jwt.sign(
@@ -14,8 +13,6 @@ export const JWTGenerateToken = (payload) =>
     )
   );
 
-// verify --> returns an errorn if token does not match
-// export because needed in middleware also
 export const verifyToken = (token) =>
   new Promise((resolve, reject) =>
     jwt.verify(token, process.env.JWT_SECRET, (error, decodedToken) => {
@@ -25,7 +22,6 @@ export const verifyToken = (token) =>
   );
 
 export const generateToken = async (user) => {
-  // given the user --> generates token --> pass ID in payload
   const accessToken = await JWTGenerateToken({ _id: user._id, role: user.role });
 
   return accessToken;

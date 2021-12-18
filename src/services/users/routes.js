@@ -23,6 +23,7 @@ const cloudStorage = new CloudinaryStorage({
   },
 });
 
+// Login
 router.route("/login").post(async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -44,6 +45,7 @@ router.route("/login").post(async (req, res, next) => {
   }
 });
 
+// Get me data based on token
 router.route("/me")
  .put(tokenAuthMiddleware, async (req, res, next) => {
   try {
@@ -54,9 +56,9 @@ router.route("/me")
   }
  });
 
+// Update avatar
 router.route("/me/avatar").post(tokenAuthMiddleware, multer({ storage: cloudStorage }).single("avatar"), async (req, res, next) => {
   try {
-    // console.log(req.file)
     const avatar = await userModel.findByIdAndUpdate(req.user._id, {$set: { avatar: req.file.path }}, {new: true})
     console.log(avatar)
     res.send(avatar)
@@ -64,7 +66,5 @@ router.route("/me/avatar").post(tokenAuthMiddleware, multer({ storage: cloudStor
     next(error)
   }
 })
-
-
 
 export default router;

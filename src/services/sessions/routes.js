@@ -4,10 +4,7 @@ import express from "express";
 // ******************** MODELS ********************
 import sessionModel from "./schema.js";
 // ******************** MIDDLEWARES ********************
-import {
-  clientsOnly,
-  therapistsOnly,
-} from "../../middlewares/auth/roleChecker.js";
+import { clientsOnly, therapistsOnly } from "../../middlewares/auth/roleChecker.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 
 const router = express.Router();
@@ -23,6 +20,7 @@ router
       .populate("clientId");
     res.send(sessions);
   })
+
 // POST /sessions => the therapist (req.user._id) creates available sessions
   .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
@@ -84,7 +82,6 @@ router.route("/:therapistId").get(tokenAuthMiddleware, async (req, res, next) =>
   }
 })
 
-
 // GET /:sessionId => get specific session
 router
   .route("/:sessionId")
@@ -92,6 +89,7 @@ router
     const session = await sessionModel.findById(req.params.sessionId).populate(['clientId', 'therapistId']);
     res.send(session);
   })
+
 // PUT /:sessionId => therapist edits something in specific session
   .put(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {
@@ -106,6 +104,7 @@ router
       next(error);
     }
   })
+  
 // DELETE /:sessionId => therapist deletes specific session
   .delete(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
     try {

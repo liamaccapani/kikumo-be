@@ -7,10 +7,8 @@ import specializationModel from "./schema.js"
 import { clientsOnly, therapistsOnly,} from "../../middlewares/auth/roleChecker.js";
 import { tokenAuthMiddleware } from "../../middlewares/auth/tokenMiddleware.js";
 
-
 const router = express.Router();
 
-// ADMINS ONLY ON POST!
 router
   .route("/")
   .get(tokenAuthMiddleware, async (req, res, next) => {

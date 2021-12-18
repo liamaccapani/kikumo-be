@@ -9,10 +9,7 @@ import sessionModel from "../../sessions/schema.js";
 import specializationModel from "../../specializations/schema.js";
 import { therapistModel } from "./therapistSchema.js";
 // ******************** MIDDLEWARES ********************
-import {
-  clientsOnly,
-  therapistsOnly,
-} from "../../../middlewares/auth/roleChecker.js";
+import { clientsOnly, therapistsOnly } from "../../../middlewares/auth/roleChecker.js";
 import { tokenAuthMiddleware } from "../../../middlewares/auth/tokenMiddleware.js";
 import { userValidation } from "../../../middlewares/validation/userValidation.js";
 // ******************** FUNCTIONS ********************
@@ -87,8 +84,6 @@ router
   });
 
 // Get Therapist by Id
-// + GET availability (separate route??) TO BE TESTED 🐲
-// + GET address (separate route??) TO BE TESTED 🐲
 router
   .route("/:therapistId")
   .get(tokenAuthMiddleware, async (req, res, next) => {
@@ -126,29 +121,6 @@ router
       next(error);
     }
   });
-
-  // router
-  // .route("/me/availability")
-  // .get(tokenAuthMiddleware, async (req, res, next) => {
-  //   try {
-  //     res.send(req.user.availableDays);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // })
-  // .post(tokenAuthMiddleware, therapistsOnly, async (req, res, next) => {
-  //   try {
-  //     const newDay = new Date(req.body);
-  //     const updatedTherapist = await therapistModel.findByIdAndUpdate(
-  //       req.user._id,
-  //       { $push: { availableDays: newDay } },
-  //       { new: true }
-  //     );
-  //     res.send(updatedTherapist);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // });
 
 // Edit or Delete Experience
 router
