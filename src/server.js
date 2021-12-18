@@ -36,7 +36,6 @@ const corsOpts = {
 server.use(cors(corsOpts))
 server.use(express.json())
 
-
 // ******************** ROUTES ********************
 server.use("/clients", clientsRouter)
 server.use("/sessions", sessionsRouter)
